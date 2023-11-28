@@ -15,11 +15,11 @@ public class kNN2 {
     }
 
     public static void Process(){
-        Double trd[][] = GetTrainingData();
-        Double tsd[][] = GetTestingData();
-        int[] tsl = GetTestLabel();
-        int[] out = GetOutputLabel();
-        String classes = "";
+        //Double trd[][] = GetTrainingData();
+        //Double tsd[][] = GetTestingData();
+        //int[] tsl = GetTestLabel();
+        //int[] out = GetOutputLabel();
+        //String classes = "";
         GAColumnComparison();
     }
 
@@ -167,13 +167,14 @@ public class kNN2 {
         //Variables for non/alchoholic count
         int alc = 0;
         int non = 0;
+        int[] trainingLabel = GetTrainingLabel();
 
         //Take the top 5 items
         for(int x = 0; x < 5; x++){
             //Find the index of the item
             int index = hash1.get(euclDist[x]);
             //If the training label of that index is 0, increment non
-            if(GetTrainingLabel()[index] == 0){
+            if(trainingLabel[index] == 0){
                 non++;
             }
             //Otherwise, increment alc
@@ -211,7 +212,7 @@ public class kNN2 {
                 y++;
             }
         }
-        
+
         Double temp = (Double.parseDouble(String.valueOf(y)))*(Double.parseDouble("100"))/(Double.parseDouble("200"));
         //System.out.println("Percentage: " + temp);
         return temp;
@@ -283,6 +284,7 @@ public class kNN2 {
     public static HashMap<Double, String> testFunction(ArrayList<String> population){
         Double[][] trainingData = GetTrainingData();
         Double[][] testingData = GetTestingData();
+        int[] testLabel = GetTestLabel();
         HashMap<Double,String> columnAccuracy = new HashMap<Double,String>();
 
         //Checking each column selection
@@ -302,7 +304,7 @@ public class kNN2 {
             }
 
             //putting the column string and the corresponding accuracy in a hashmap
-            columnAccuracy.put(CompareLabels(classification, GetTestLabel()), columnSelection);
+            columnAccuracy.put(CompareLabels(classification, testLabel), columnSelection);
         }
         return columnAccuracy;
     }
