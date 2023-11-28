@@ -16,15 +16,14 @@ public class kNN2 {
     public static void Process(){
         Double trd[][] = GetTrainingData();
         Double tsd[][] = GetTestingData();
-        //int[] trl = GetTrainingLabel();
         int[] tsl = GetTestLabel();
         int[] out = GetOutputLabel();
         String classes = "";
 
-        for(int x = 0; x < 200; x++){
+        /*for(int x = 0; x < 200; x++){
             classes += " " + String.valueOf(EuclideanCompare(tsd[x], trd));
         }
-        WriteClassData(classes);
+        WriteClassData(classes);*/
         //System.out.println(CompareLabels(out, tsl));
         GAColumnComparison();
     }
@@ -157,7 +156,7 @@ public class kNN2 {
     /*
      * Works out the difference of one test row to every other row in training data
      */
-    public static int EuclideanCompare(Double[] testingData, Double[][] trainingData){
+    /*public static int EuclideanCompare(Double[] testingData, Double[][] trainingData){
         Double[] differences = new Double[200];
         for(int row = 0; row < 200; row++){
             differences[row] = Double.parseDouble("0");
@@ -168,7 +167,7 @@ public class kNN2 {
         }
         int index = getClass(differences);
         return index;
-    }
+    }*/
 
     /*
      * find the class of item based on kNN (k=5)
@@ -310,11 +309,8 @@ public class kNN2 {
             }
 
             ArrayList<String> temp = new ArrayList<String>();
-            temp.add(columnAccuracy.get(values.get(index)));         //add the key
-            temp.add(String.valueOf(values.get(index)));               //Add the value
-
-            System.out.println("Random Numb: " + randNum);
-            System.out.println("Random Numb: " + columnAccuracy.get(values.get(index)));
+            temp.add(columnAccuracy.get(values.get(index-1)));         //add the key
+            temp.add(String.valueOf(values.get(index-1)));               //Add the value
 
             parents.add(temp);                                      //add to parents arraylist
         }
