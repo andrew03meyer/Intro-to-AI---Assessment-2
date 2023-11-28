@@ -264,8 +264,8 @@ public class kNN2 {
         HashMap<Double, String> columnAccuracy = testFunction(population);
 
         //Call picker
-        ArrayList<ArrayList> parents = picker(columnAccuracy);
-
+        ArrayList<String> parents = picker(columnAccuracy);
+        evolve(population);
     }
 
     /*
@@ -302,11 +302,11 @@ public class kNN2 {
     /*
      * Picks new 100 based on their accuracy
      * @param - HashMap Key: accuracy, Value: column selection
-     * @return - 2D ArrayList containing new parents
+     * @return - String ArrayList containing new parents
      */
-    public static ArrayList<ArrayList> picker(HashMap<Double, String> columnAccuracy){
+    public static ArrayList<String> picker(HashMap<Double, String> columnAccuracy){
         ArrayList<Double> values = new ArrayList<Double>();
-        ArrayList<ArrayList> parents = new ArrayList<ArrayList>();
+        ArrayList<String> parents = new ArrayList<String>();
 
         //find the sum
         Double sum = Double.parseDouble("0");
@@ -329,10 +329,7 @@ public class kNN2 {
             }
 
             ArrayList<String> temp = new ArrayList<String>();
-            temp.add(columnAccuracy.get(values.get(index-1)));         //add the key
-            temp.add(String.valueOf(values.get(index-1)));               //Add the value
-
-            parents.add(temp);                                      //add to parents arraylist
+            parents.add(columnAccuracy.get(values.get(index-1)));         //add the key
         }
         return parents;
     }
@@ -342,8 +339,29 @@ public class kNN2 {
      * @param - 2D array of parents
      * @return - 2D array of new parents
      */
-    public static ArrayList<ArrayList> evolve(ArrayList<ArrayList> population){
-        ArrayList<ArrayList> parents = new ArrayList<ArrayList>();
+    public static ArrayList<String> evolve(ArrayList<String> population){
+        ArrayList<String> parents = new ArrayList<String>();
+
+        //Split population into two
+        ArrayList<String> firstHalf = new ArrayList<String>(population.subList(0, (population.size()/2)-1));
+        ArrayList<String> secondHalf = new ArrayList<String>(population.subList(population.size()/2, population.size()));
+
+        for(int index = 0; index < firstHalf.size(); index++){
+
+            System.out.println("Original rows\nFirst Half: " + firstHalf.get(index) + " Second half: " + secondHalf.get(index));
+            //Each half of first values
+            String ffhString = firstHalf.get(index).substring(0, (secondHalf.size()/2)-1);
+            String fshString = firstHalf.get(index).substring(secondHalf.size(), secondHalf.size());
+
+            //Each half of second values
+            String sfhString = firstHalf.get(index).substring(0, (secondHalf.size()/2)-1);
+            String sshString = firstHalf.get(index).substring(secondHalf.size(), secondHalf.size());
+
+            firstHalf.add(index, sfhString + fshString);
+            firstHalf.add(index, ffhString + sshString);
+
+            System.out.println("New Rows\nFirst Half: " + firstHalf.get(index) + " Second half: " + secondHalf.get(index));
+        }
 
         parents = mutation(parents);
         return parents;
@@ -354,8 +372,8 @@ public class kNN2 {
      * @param - 2D ArrayList of columns
      * @return - 2D ArrayList of mutated columns
      */
-    public static ArrayList<ArrayList> mutation(ArrayList<ArrayList> population){
-        ArrayList<ArrayList> parents = new ArrayList<ArrayList>();
+    public static ArrayList<String> mutation(ArrayList<String> population){
+        ArrayList<String> parents = new ArrayList<String>();
         return parents;
     }
 }
