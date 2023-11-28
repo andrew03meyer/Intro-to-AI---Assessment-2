@@ -348,19 +348,21 @@ public class kNN2 {
 
         for(int index = 0; index < firstHalf.size(); index++){
 
-            System.out.println("Original rows\nFirst Half: " + firstHalf.get(index) + " Second half: " + secondHalf.get(index));
+            System.out.println("Original rows\nFirst Half: " + firstHalf.get(index) + "\nSecond half: " + secondHalf.get(index));
             //Each half of first values
-            String ffhString = firstHalf.get(index).substring(0, (secondHalf.size()/2)-1);
-            String fshString = firstHalf.get(index).substring(secondHalf.size(), secondHalf.size());
+            String ffhString = firstHalf.get(index).substring(0, (firstHalf.size()/2)-1);
+            String fshString = firstHalf.get(index).substring(firstHalf.size()/2, firstHalf.size()-1);
 
             //Each half of second values
-            String sfhString = firstHalf.get(index).substring(0, (secondHalf.size()/2)-1);
-            String sshString = firstHalf.get(index).substring(secondHalf.size(), secondHalf.size());
+            String sfhString = secondHalf.get(index).substring(0, (secondHalf.size()/2)-1);
+            String sshString = secondHalf.get(index).substring(secondHalf.size()/2, secondHalf.size()-1);
+
+            System.out.println(ffhString + " " + fshString + " " + sfhString + " " + sshString);
 
             firstHalf.add(index, sfhString + fshString);
             firstHalf.add(index, ffhString + sshString);
 
-            System.out.println("New Rows\nFirst Half: " + firstHalf.get(index) + " Second half: " + secondHalf.get(index));
+            System.out.println("New Rows\nFirst Half: " + firstHalf.get(index) + "\nSecond half: " + secondHalf.get(index));
         }
 
         parents = mutation(parents);
