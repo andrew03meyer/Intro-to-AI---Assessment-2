@@ -213,7 +213,7 @@ public class kNN2 {
         }
         
         Double temp = (Double.parseDouble(String.valueOf(y)))*(Double.parseDouble("100"))/(Double.parseDouble("200"));
-        System.out.println("Percentage: " + temp);
+        //System.out.println("Percentage: " + temp);
         return temp;
     }
 
@@ -265,7 +265,15 @@ public class kNN2 {
 
         //Call picker
         ArrayList<String> parents = picker(columnAccuracy);
+
+        //Call evolve
         evolve(population);
+
+        //20% chance for mutation
+        int rand = rnd.nextInt(100);
+        if(rand <= 100) {
+            parents = mutation(parents);
+        }
     }
 
     /*
@@ -335,7 +343,7 @@ public class kNN2 {
     }
 
     /*
-     * Mix up 2 random rows of data
+     * Mix up 2 rows of data
      * @param - 2D array of parents
      * @return - 2D array of new parents
      */
@@ -343,40 +351,56 @@ public class kNN2 {
         ArrayList<String> parents = new ArrayList<String>();
 
         //Split population into two
-        ArrayList<String> firstHalf = new ArrayList<String>(population.subList(0, (population.size()/2)-1));
+        ArrayList<String> firstHalf = new ArrayList<String>(population.subList(0, (population.size()/2)));
         ArrayList<String> secondHalf = new ArrayList<String>(population.subList(population.size()/2, population.size()));
 
         for(int index = 0; index < firstHalf.size(); index++){
-
-            System.out.println("Original rows\nFirst Half: " + firstHalf.get(index) + "\nSecond half: " + secondHalf.get(index));
+            //System.out.println("Original rows\nFirst Half: " + firstHalf.get(index) + "\nSecond half: " + secondHalf.get(index));
             //Each half of first values
-            String ffhString = firstHalf.get(index).substring(0, (firstHalf.size()/2)-1);
-            String fshString = firstHalf.get(index).substring(firstHalf.size()/2, firstHalf.size()-1);
+            String ffhString = firstHalf.get(index).replaceAll("\\s+", "").substring(0, 30);
+            String fshString = firstHalf.get(index).replaceAll("\\s+", "").substring(30, 61);
 
             //Each half of second values
-            String sfhString = secondHalf.get(index).substring(0, (secondHalf.size()/2)-1);
-            String sshString = secondHalf.get(index).substring(secondHalf.size()/2, secondHalf.size()-1);
+            String sfhString = secondHalf.get(index).replaceAll("\\s+", "").substring(0, 30);
+            String sshString = secondHalf.get(index).replaceAll("\\s+", "").substring(30, 61);
 
-            System.out.println(ffhString + " " + fshString + " " + sfhString + " " + sshString);
+           // System.out.println(ffhString + " :" + fshString + " :" + sfhString + " :" + sshString);
 
-            firstHalf.add(index, sfhString + fshString);
-            firstHalf.add(index, ffhString + sshString);
+            parents.add(sfhString + fshString);
+            parents.add(ffhString + sshString);
 
-            System.out.println("New Rows\nFirst Half: " + firstHalf.get(index) + "\nSecond half: " + secondHalf.get(index));
+            //System.out.println("New Rows\nFirst Half: " + parents.get(parents.size()-2     ) + "\nSecond half: " + parents.get(parents.size()-1));
         }
 
-        parents = mutation(parents);
+
         return parents;
     }
 
     /*
-     * A chance for each row to be mutated
+     * Mutate 20 rows
      * @param - 2D ArrayList of columns
      * @return - 2D ArrayList of mutated columns
      */
     public static ArrayList<String> mutation(ArrayList<String> population){
-        ArrayList<String> parents = new ArrayList<String>();
-        return parents;
+        System.out.println("In mutation method");
+        for(int x = 0; x < 20; x++){
+            System.out.println(population.get(x));
+            String selection = population.get(x).replaceAll("\\s+", "");
+            String newSelection = "";
+
+            //For each character in that selection
+            for(char value : selection.toCharArray()){
+                if(value == '0'){
+                    newSelection += "1 ";
+                }
+                else{
+                    newSelection += "0 ";
+                }
+            }
+            population.add(x, newSelection);
+            System.out.println(population.get(x));
+        }
+        return population;
     }
 }
 
