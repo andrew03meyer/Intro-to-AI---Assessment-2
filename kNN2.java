@@ -1,3 +1,4 @@
+import javax.lang.model.type.ArrayType;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -237,8 +238,12 @@ public class kNN2 {
      * @return - accuracy
      */
     public static void GAColumnComparison(){
+        Double[][] trainingData = GetTrainingData();
+        Double[][] testingData = GetTestingData();
+        int[] testLabel = GetTestLabel();
         ArrayList<String> population = new ArrayList<String>();
         Random rnd = new Random();
+        ArrayList<ArrayList<String>> selectionAccuracy = new ArrayList<ArrayList<String>>();
         
         //Initial population of array
         for(int x = 0; x < 100; x++){
@@ -248,56 +253,56 @@ public class kNN2 {
                 int value = Math.abs(rnd.nextInt() % 2);
                 stringValue += String.valueOf(value) + " ";
             }
-
             population.add(stringValue);
         }
 
-        //Call test function
-        HashMap<Double, String> columnAccuracy = testFunction(population);
+        //
+        for(String selection : population){
+            //Call test function
+            ArrayList<String> columnAccuracy = testFunction(selection, trainingData, testingData, testLabel);
+            selectionAccuracy.add(columnAccuracy);
 
-        //Call picker
-        ArrayList<String> parents = picker(columnAccuracy);
+            //Call picker
+            population = picker(selectionAccuracy);
 
-        //Call evolve
-        evolve(population);
+            //Call evolve
+            population = evolve(population);
 
-        //20% chance for mutation
-        int rand = rnd.nextInt(100);
-        if(rand <= 100) {
-            parents = mutation(parents);
+            //20% chance for mutation
+            int rand = rnd.nextInt(100);
+            if(rand <= 100) {
+                population = mutation(population);
+            }
         }
     }
 
     /*
-    * @param - String ArrayList Population
-    * @calls - EuclideanCompare, CompareLabels, GetTrainingData, GetTestingData, GetTestLabel
-    * Converts population into array
+    * @param - One row of population, trainingData, testingData, testLabel
+    * @calls - EuclideanCompare, CompareLabels
+    * @return - String array with population and accuracy
      */
-    public static HashMap<Double, String> testFunction(ArrayList<String> population){
-        Double[][] trainingData = GetTrainingData();
-        Double[][] testingData = GetTestingData();
-        int[] testLabel = GetTestLabel();
-        HashMap<Double,String> columnAccuracy = new HashMap<Double,String>();
+    public static ArrayList<String> testFunction(String population, Double[][]trainingData, Double[][] testingData, int[] testLabel){
 
-        //Checking each column selection
-        for(String columnSelection : population){
-            //Individual column as string array
-            String[] columnArray = columnSelection.stripTrailing().split(" ");
-            //Parsing string array into int array
-            int[] intColumnArray = new int[columnArray.length];
-            for(int x = 0; x < columnArray.length; x++){
-                intColumnArray[x] = Integer.parseInt(columnArray[x]);
-            }
+        ArrayList<String> columnAccuracy = new ArrayList<String>();
 
-            //Getting each row classification for that set of columns
-            int[] classification = new int[200];
-            for(int x = 0; x < 200; x++){
-                classification[x] = EuclideanCompare(testingData[x], trainingData, intColumnArray);
-            }
-
-            //putting the column string and the corresponding accuracy in a hashmap
-            columnAccuracy.put(CompareLabels(classification, testLabel), columnSelection);
+        //Individual column as string array
+        String[] columnArray = population.stripTrailing().split(" ");
+        //Parsing string array into int array
+        int[] intColumnArray = new int[columnArray.length];
+        for(int x = 0; x < columnArray.length; x++){
+            intColumnArray[x] = Integer.parseInt(columnArray[x]);
         }
+
+        //Getting each row classification for that set of columns
+        int[] classification = new int[200];
+        for(int x = 0; x < 200; x++){
+            classification[x] = EuclideanCompare(testingData[x], trainingData, intColumnArray);
+        }
+
+        //putting the column string and the corresponding accuracy in a hashmap
+        columnAccuracy.add(population);
+        columnAccuracy.add(String.valueOf(CompareLabels(classification, testLabel)));
+
         return columnAccuracy;
     }
 
@@ -306,15 +311,15 @@ public class kNN2 {
      * @param - HashMap Key: accuracy, Value: column selection
      * @return - String ArrayList containing new parents
      */
-    public static ArrayList<String> picker(HashMap<Double, String> columnAccuracy){
+    public static ArrayList<String> picker(ArrayList<ArrayList<String>> columnAccuracy){
         ArrayList<Double> values = new ArrayList<Double>();
         ArrayList<String> parents = new ArrayList<String>();
 
         //find the sum
         Double sum = Double.parseDouble("0");
-        for(Double temp : columnAccuracy.keySet()){
-            sum += temp;
-            values.add(temp);
+        for(ArrayList<String> temp : columnAccuracy){
+            sum += Double.parseDouble(temp.get(1));
+            values.add(Double.parseDouble(temp.get(1)));
         }
 
         //pick 100 values (based on chance)
@@ -330,8 +335,8 @@ public class kNN2 {
                 index++;
             }
 
-            ArrayList<String> temp = new ArrayList<String>();
-            parents.add(columnAccuracy.get(values.get(index-1)));         //add the key
+            //add the key
+            parents.add(columnAccuracy.get(x).get(0));
         }
         return parents;
     }
@@ -363,7 +368,7 @@ public class kNN2 {
             parents.add(sfhString + fshString);
             parents.add(ffhString + sshString);
 
-            //System.out.println("New Rows\nFirst Half: " + parents.get(parents.size()-2     ) + "\nSecond half: " + parents.get(parents.size()-1));
+            System.out.println("New Rows\nFirst Half: " + parents.get(parents.size()-2     ) + "\nSecond half: " + parents.get(parents.size()-1));
         }
 
 
@@ -378,7 +383,7 @@ public class kNN2 {
     public static ArrayList<String> mutation(ArrayList<String> population){
         System.out.println("In mutation method");
         for(int x = 0; x < 20; x++){
-            System.out.println(population.get(x));
+            //System.out.println(population.get(x));
             String selection = population.get(x).replaceAll("\\s+", "");
             String newSelection = "";
 
@@ -392,7 +397,7 @@ public class kNN2 {
                 }
             }
             population.add(x, newSelection);
-            System.out.println(population.get(x));
+            //System.out.println(population.get(x));
         }
         return population;
     }
