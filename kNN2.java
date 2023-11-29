@@ -1,4 +1,3 @@
-import javax.lang.model.type.ArrayType;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.io.File;
@@ -264,26 +263,27 @@ public class kNN2 {
         }
 
         int index = 0;
+        Double toBeat = bestAccuracy(populationAndAccuracy(population, trainingData, testingData, testLabel))+30;
         Double highest = Double.parseDouble("0");
 
-        while(index < 20 && highest < 90) {
+        while(index < 20 && highest < toBeat) {
             System.out.println("New Population");
 
             ArrayList<ArrayList<String>> selectionAccuracy = populationAndAccuracy(population, trainingData, testingData, testLabel);
 
-            //Call picker
-            population = picker(selectionAccuracy);
+            //Call fitnessFunction
+            population = fitnessFunction(selectionAccuracy);
 
             //Call evolve
             population = evolve(population);
 
             //20% chance for mutation
             int rand = rnd.nextInt(100);
-            if (rand <= 20) {
+            if (rand <= 5) {
                 population = mutation(population);
             }
 
-            System.out.println("Population(0): " + population.get(0));
+            //System.out.println("Population(0): " + population.get(0));
 
             highest = bestAccuracy(selectionAccuracy);
             index++;
@@ -328,23 +328,11 @@ public class kNN2 {
     }
 
     /*
-    * @param - One row of population, trainingData, testingData, testLabel
-    * @calls -
-    * @return -
-     */
-    public static void testFunction(ArrayList<String> population, Double[][]trainingData, Double[][] testingData, int[] testLabel){
-
-        //Call test populationAndAccuracy
-        ArrayList<ArrayList<String>> selectionAccuracy = populationAndAccuracy(population, trainingData, testingData, testLabel);
-
-    }
-
-    /*
      * Picks new 100 based on their accuracy
-     * @param - HashMap Key: accuracy, Value: column selection
+     * @param - 2d ArrayList with column selection and accuracy
      * @return - String ArrayList containing new parents
      */
-    public static ArrayList<String> picker(ArrayList<ArrayList<String>> columnAccuracy){
+    public static ArrayList<String> fitnessFunction(ArrayList<ArrayList<String>> columnAccuracy){
         ArrayList<Double> values = new ArrayList<Double>();
         ArrayList<String> parents = new ArrayList<String>();
 
@@ -381,29 +369,39 @@ public class kNN2 {
      * @return - 2D array of new parents
      */
     public static ArrayList<String> evolve(ArrayList<String> population){
+        Random rnd = new Random();
+
         ArrayList<String> parents = new ArrayList<String>();
+
+        //make it random
+        Collections.shuffle(population);
 
         //Split population into two
         ArrayList<String> firstHalf = new ArrayList<String>(population.subList(0, (population.size()/2)));
         ArrayList<String> secondHalf = new ArrayList<String>(population.subList(population.size()/2, population.size()));
 
         for(int index = 0; index < firstHalf.size(); index++){
-            //Each half of first values
-            String ffhString = firstHalf.get(index).substring(0, 61);
-            String fshString = firstHalf.get(index).substring(61, 122);
+            //80% for each parent to crossover
+            int random = rnd.nextInt(100);
+            if(random <= 80) {
+                //Each half of first values
+                String ffhString = firstHalf.get(index).substring(0, 61);
+                String fshString = firstHalf.get(index).substring(61, 122);
 
-            //Each half of second values
-            String sfhString = secondHalf.get(index).substring(0, 61);
-            String sshString = secondHalf.get(index).substring(61, 122);
+                //Each half of second values
+                String sfhString = secondHalf.get(index).substring(0, 61);
+                String sshString = secondHalf.get(index).substring(61, 122);
 
-            parents.add(sfhString + fshString);
-            parents.add(ffhString + sshString);
-
+                parents.add(sfhString + fshString);
+                parents.add(ffhString + sshString);
+            }
+            else{
+                parents.add(firstHalf.get(index));
+                parents.add(secondHalf.get(index));
+            }
             //System.out.println("First Half: " + parents.get(parents.size()-2     ) + "\nSecond half: " + parents.get(parents.size()-1));
         }
         System.out.println("Evolved");
-
-        Collections.shuffle(parents);
 
         return parents;
     }
@@ -415,7 +413,7 @@ public class kNN2 {
      */
     public static ArrayList<String> mutation(ArrayList<String> population){
         System.out.println("Mutated");
-        for(int x = 0; x < 20; x++){
+        for(int x = 0; x < 5; x++){
             String selection = population.get(x).replaceAll("\\s+", "");
             String newSelection = "";
 
@@ -430,7 +428,21 @@ public class kNN2 {
             }
             population.add(x, newSelection);
         }
-        Collections.shuffle(population);
+
+        /*Collections.shuffle(population);
+        Random rnd = new Random();
+        int randPop = rnd.nextInt(100);
+        int randChar = rnd.nextInt(122);
+        System.out.println("Before: " + population.get(randPop));
+        char[] populationCharac = population.get(randPop).toCharArray();
+        if(populationCharac[randChar] == '0'){
+            populationCharac[randChar] = '1';
+        }
+        else{
+            populationCharac[randChar] = '0';
+        }
+        population.add(randPop, new String(populationCharac));
+        System.out.println("After: " + population.get(randPop));*/
 
         return population;
     }
