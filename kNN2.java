@@ -1,14 +1,8 @@
 import javax.lang.model.type.ArrayType;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Random;
 
 public class kNN2 {
     public static void main(String[] args){
@@ -206,7 +200,6 @@ public class kNN2 {
         }
 
         Double temp = (Double.parseDouble(String.valueOf(y)))*(Double.parseDouble("100"))/(Double.parseDouble("200"));
-        //System.out.println("Percentage: " + temp);
         return temp;
     }
 
@@ -232,10 +225,17 @@ public class kNN2 {
         return index;
     }
 
-    public static Double bestAccuracy(ArrayList<Double> acc){
-        Collections.sort(acc);
-        System.out.println(acc.get(0));
-        return acc.get(0);
+
+    public static Double bestAccuracy(ArrayList<ArrayList<String>> acc){
+        ArrayList<Double> val = new ArrayList<Double>();
+
+        for(ArrayList<String> temp : acc) {
+            val.add(Double.parseDouble(temp.get(1)));
+        }
+
+        Collections.sort(val);
+        System.out.println("Accuracy: " + val.get(val.size()-1));
+        return val.get(val.size()-1);
     }
 
     /*
@@ -247,10 +247,11 @@ public class kNN2 {
         Double[][] trainingData = GetTrainingData();
         Double[][] testingData = GetTestingData();
         int[] testLabel = GetTestLabel();
+
         ArrayList<String> population = new ArrayList<String>();
+
         Random rnd = new Random();
-        ArrayList<ArrayList<String>> selectionAccuracy = new ArrayList<ArrayList<String>>();
-        
+
         //Initial population of array
         for(int x = 0; x < 100; x++){
             String stringValue = "";
@@ -265,16 +266,10 @@ public class kNN2 {
         int index = 0;
         Double highest = Double.parseDouble("0");
 
-        while(index < 5 && highest < 90) {
+        while(index < 20 && highest < 90) {
             System.out.println("New Population");
-            ArrayList<Double> values = new ArrayList<Double>();
-            //Call test function per row
-            for (String selection : population) {
-                ArrayList<String> columnAccuracy = testFunction(selection, trainingData, testingData, testLabel);
-                selectionAccuracy.add(columnAccuracy);
-                values.add(Double.parseDouble(columnAccuracy.get(1)));
-            }
-            System.out.println("Values[0]" + values.get(0));
+
+            ArrayList<ArrayList<String>> selectionAccuracy = populationAndAccuracy(population, trainingData, testingData, testLabel);
 
             //Call picker
             population = picker(selectionAccuracy);
@@ -288,41 +283,60 @@ public class kNN2 {
                 population = mutation(population);
             }
 
-            System.out.println("Population(0):" + population.get(0));
+            System.out.println("Population(0): " + population.get(0));
 
-            highest = bestAccuracy(values);
+            highest = bestAccuracy(selectionAccuracy);
             index++;
         }
     }
 
     /*
-    * @param - One row of population, trainingData, testingData, testLabel
-    * @calls - EuclideanCompare, CompareLabels
-    * @return - String array with population and accuracy
+     * @param - Population, trainingData, testingData, testingLabels
+     * @calls - getAccuracy
+     * @return - 2D array of columnSelection and accuracy
      */
-    public static ArrayList<String> testFunction(String population, Double[][]trainingData, Double[][] testingData, int[] testLabel){
+    public static ArrayList<ArrayList<String>> populationAndAccuracy(ArrayList<String> population, Double[][] trainingData, Double[][] testingData, int[] testingLabels){
+        ArrayList<ArrayList<String>> selectionAccuracy = new ArrayList<ArrayList<String>>();
 
-        ArrayList<String> columnAccuracy = new ArrayList<String>();
-
-        //Individual column as string array
-        String[] columnArray = population.stripTrailing().split(" ");
-        //Parsing string array into int array
-        int[] intColumnArray = new int[columnArray.length];
-        for(int x = 0; x < columnArray.length; x++){
-            intColumnArray[x] = Integer.parseInt(columnArray[x]);
+        for(String row : population){
+            ArrayList<String> temp = new ArrayList<String>();
+            temp.add(row);
+            temp.add(String.valueOf(getAccuracy(row, trainingData, testingData, testingLabels)));
+            selectionAccuracy.add(temp);
         }
 
-        //Getting each row classification for that set of columns
-        int[] classification = new int[200];
-        for(int x = 0; x < 200; x++){
-            classification[x] = EuclideanCompare(testingData[x], trainingData, intColumnArray);
+        return selectionAccuracy;
+    }
+
+    public static Double getAccuracy(String population, Double[][] trainingData, Double[][] testingData, int[] testingLabels){
+
+        //Make int array of population
+        String[] pop = population.stripTrailing().split(" ");
+        int[] popInt = new int[pop.length];
+        for(int x = 0; x < pop.length; x++){
+            popInt[x] = Integer.parseInt(pop[x]);
         }
 
-        //putting the column string and the corresponding accuracy in a hashmap
-        columnAccuracy.add(population);
-        columnAccuracy.add(String.valueOf(CompareLabels(classification, testLabel)));
+        //Get an array of classes for each row, for that column selection
+        int[] classifications = new int[200];
+        for(int y = 0; y < 200; y++){
+            classifications[y] = EuclideanCompare(testingData[y], trainingData, popInt);
+        }
 
-        return columnAccuracy;
+        //return the accuracy of the found labels
+        return CompareLabels(classifications, testingLabels);
+    }
+
+    /*
+    * @param - One row of population, trainingData, testingData, testLabel
+    * @calls -
+    * @return -
+     */
+    public static void testFunction(ArrayList<String> population, Double[][]trainingData, Double[][] testingData, int[] testLabel){
+
+        //Call test populationAndAccuracy
+        ArrayList<ArrayList<String>> selectionAccuracy = populationAndAccuracy(population, trainingData, testingData, testLabel);
+
     }
 
     /*
@@ -356,6 +370,7 @@ public class kNN2 {
 
             //add the key
             parents.add(columnAccuracy.get(x).get(0));
+            //System.out.println("Parent: " + columnAccuracy.get(x).get(0) + "        Accuracy: " + columnAccuracy.get(x).get(1));
         }
         return parents;
     }
