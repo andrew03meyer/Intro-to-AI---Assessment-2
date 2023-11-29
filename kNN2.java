@@ -11,15 +11,6 @@ import java.util.Random;
 
 public class kNN2 {
     public static void main(String[] args){
-        Process();
-    }
-
-    public static void Process(){
-        //Double trd[][] = GetTrainingData();
-        //Double tsd[][] = GetTestingData();
-        //int[] tsl = GetTestLabel();
-        //int[] out = GetOutputLabel();
-        //String classes = "";
         GAColumnComparison();
     }
 
@@ -278,7 +269,8 @@ public class kNN2 {
     }
 
     /*
-    * @param - Population
+    * @param - String ArrayList Population
+    * @calls - EuclideanCompare, CompareLabels, GetTrainingData, GetTestingData, GetTestLabel
     * Converts population into array
      */
     public static HashMap<Double, String> testFunction(ArrayList<String> population){
