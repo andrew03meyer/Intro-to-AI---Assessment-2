@@ -138,7 +138,7 @@ public class kNN2 {
      * Parameters - Array of Euclidean distances of each row
      * Return 0/1 based on 5 closest values
      */
-    public static int getClass(Double[] euclDist){
+    public static int getClass(Double[] euclDist, int[] trainingLabel){
 
         //Create a HashMap to negate loss of index
         HashMap<Double, Integer> hash1 = new HashMap<Double, Integer>();
@@ -152,7 +152,7 @@ public class kNN2 {
         //Variables for non/alchoholic count
         int alc = 0;
         int non = 0;
-        int[] trainingLabel = GetTrainingLabel();
+        //int[] trainingLabel = GetTrainingLabel();
 
         //Take the top 5 items
         for(int x = 0; x < 5; x++){
@@ -208,7 +208,7 @@ public class kNN2 {
      * @parameters - row of test data, complete train data, the array of column selection
      * @return - classification of that row
      */
-    public static int EuclideanCompare(Double[] testingData, Double[][] trainingData, int[] columnArray){
+    public static int EuclideanCompare(Double[] testingData, Double[][] trainingData, int[] columnArray, int[]trainingLabel){
         Double[] differences = new Double[200];
         for(int row = 0; row < 200; row++){
 
@@ -220,7 +220,7 @@ public class kNN2 {
             }
             differences[row] = Math.sqrt(differences[row]);
         }
-        int index = getClass(differences);
+        int index = getClass(differences, trainingLabel);
         return index;
     }
 
@@ -246,6 +246,7 @@ public class kNN2 {
         Double[][] trainingData = GetTrainingData();
         Double[][] testingData = GetTestingData();
         int[] testLabel = GetTestLabel();
+        int[] trainingLabel = GetTrainingLabel();
 
         ArrayList<String> population = new ArrayList<String>();
 
@@ -263,13 +264,13 @@ public class kNN2 {
         }
 
         int index = 0;
-        Double toBeat = bestAccuracy(populationAndAccuracy(population, trainingData, testingData, testLabel))+30;
+        Double toBeat = bestAccuracy(populationAndAccuracy(population, trainingData, testingData, testLabel, trainingLabel))+30;
         Double highest = Double.parseDouble("0");
 
-        while(index < 20 && highest < toBeat) {
+        while(index < 100 && highest < toBeat) {
             System.out.println("New Population");
 
-            ArrayList<ArrayList<String>> selectionAccuracy = populationAndAccuracy(population, trainingData, testingData, testLabel);
+            ArrayList<ArrayList<String>> selectionAccuracy = populationAndAccuracy(population, trainingData, testingData, testLabel, trainingLabel);
 
             //Call fitnessFunction
             population = fitnessFunction(selectionAccuracy);
@@ -295,20 +296,20 @@ public class kNN2 {
      * @calls - getAccuracy
      * @return - 2D array of columnSelection and accuracy
      */
-    public static ArrayList<ArrayList<String>> populationAndAccuracy(ArrayList<String> population, Double[][] trainingData, Double[][] testingData, int[] testingLabels){
+    public static ArrayList<ArrayList<String>> populationAndAccuracy(ArrayList<String> population, Double[][] trainingData, Double[][] testingData, int[] testingLabels, int[]trainingLabel){
         ArrayList<ArrayList<String>> selectionAccuracy = new ArrayList<ArrayList<String>>();
 
         for(String row : population){
             ArrayList<String> temp = new ArrayList<String>();
             temp.add(row);
-            temp.add(String.valueOf(getAccuracy(row, trainingData, testingData, testingLabels)));
+            temp.add(String.valueOf(getAccuracy(row, trainingData, testingData, testingLabels, trainingLabel)));
             selectionAccuracy.add(temp);
         }
 
         return selectionAccuracy;
     }
 
-    public static Double getAccuracy(String population, Double[][] trainingData, Double[][] testingData, int[] testingLabels){
+    public static Double getAccuracy(String population, Double[][] trainingData, Double[][] testingData, int[] testingLabels, int[]trainingLabel){
 
         //Make int array of population
         String[] pop = population.stripTrailing().split(" ");
@@ -320,7 +321,7 @@ public class kNN2 {
         //Get an array of classes for each row, for that column selection
         int[] classifications = new int[200];
         for(int y = 0; y < 200; y++){
-            classifications[y] = EuclideanCompare(testingData[y], trainingData, popInt);
+            classifications[y] = EuclideanCompare(testingData[y], trainingData, popInt, trainingLabel);
         }
 
         //return the accuracy of the found labels
