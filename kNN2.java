@@ -232,6 +232,12 @@ public class kNN2 {
         return index;
     }
 
+    public static Double bestAccuracy(ArrayList<Double> acc){
+        Collections.sort(acc);
+        System.out.println(acc.get(0));
+        return acc.get(0);
+    }
+
     /*
      * Creates new random 100 population
      * @calls - testFunction, picker, mutation
@@ -256,11 +262,19 @@ public class kNN2 {
             population.add(stringValue);
         }
 
-        //
-        for(String selection : population){
-            //Call test function
-            ArrayList<String> columnAccuracy = testFunction(selection, trainingData, testingData, testLabel);
-            selectionAccuracy.add(columnAccuracy);
+        int index = 0;
+        Double highest = Double.parseDouble("0");
+
+        while(index < 5 && highest < 90) {
+            System.out.println("New Population");
+            ArrayList<Double> values = new ArrayList<Double>();
+            //Call test function per row
+            for (String selection : population) {
+                ArrayList<String> columnAccuracy = testFunction(selection, trainingData, testingData, testLabel);
+                selectionAccuracy.add(columnAccuracy);
+                values.add(Double.parseDouble(columnAccuracy.get(1)));
+            }
+            System.out.println("Values[0]" + values.get(0));
 
             //Call picker
             population = picker(selectionAccuracy);
@@ -270,9 +284,14 @@ public class kNN2 {
 
             //20% chance for mutation
             int rand = rnd.nextInt(100);
-            if(rand <= 100) {
+            if (rand <= 20) {
                 population = mutation(population);
             }
+
+            System.out.println("Population(0):" + population.get(0));
+
+            highest = bestAccuracy(values);
+            index++;
         }
     }
 
@@ -354,23 +373,22 @@ public class kNN2 {
         ArrayList<String> secondHalf = new ArrayList<String>(population.subList(population.size()/2, population.size()));
 
         for(int index = 0; index < firstHalf.size(); index++){
-            //System.out.println("Original rows\nFirst Half: " + firstHalf.get(index) + "\nSecond half: " + secondHalf.get(index));
             //Each half of first values
-            String ffhString = firstHalf.get(index).replaceAll("\\s+", "").substring(0, 30);
-            String fshString = firstHalf.get(index).replaceAll("\\s+", "").substring(30, 61);
+            String ffhString = firstHalf.get(index).substring(0, 61);
+            String fshString = firstHalf.get(index).substring(61, 122);
 
             //Each half of second values
-            String sfhString = secondHalf.get(index).replaceAll("\\s+", "").substring(0, 30);
-            String sshString = secondHalf.get(index).replaceAll("\\s+", "").substring(30, 61);
-
-           // System.out.println(ffhString + " :" + fshString + " :" + sfhString + " :" + sshString);
+            String sfhString = secondHalf.get(index).substring(0, 61);
+            String sshString = secondHalf.get(index).substring(61, 122);
 
             parents.add(sfhString + fshString);
             parents.add(ffhString + sshString);
 
-            System.out.println("New Rows\nFirst Half: " + parents.get(parents.size()-2     ) + "\nSecond half: " + parents.get(parents.size()-1));
+            //System.out.println("First Half: " + parents.get(parents.size()-2     ) + "\nSecond half: " + parents.get(parents.size()-1));
         }
+        System.out.println("Evolved");
 
+        Collections.shuffle(parents);
 
         return parents;
     }
@@ -381,9 +399,8 @@ public class kNN2 {
      * @return - 2D ArrayList of mutated columns
      */
     public static ArrayList<String> mutation(ArrayList<String> population){
-        System.out.println("In mutation method");
+        System.out.println("Mutated");
         for(int x = 0; x < 20; x++){
-            //System.out.println(population.get(x));
             String selection = population.get(x).replaceAll("\\s+", "");
             String newSelection = "";
 
@@ -397,8 +414,9 @@ public class kNN2 {
                 }
             }
             population.add(x, newSelection);
-            //System.out.println(population.get(x));
         }
+        Collections.shuffle(population);
+
         return population;
     }
 }
