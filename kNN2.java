@@ -1,13 +1,14 @@
-import java.lang.reflect.Array;
+import jdk.jfr.Category;
+
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.Random;
+import java.util.Collections;
 
 public class kNN2 {
     public static void main(String[] args){
@@ -150,84 +151,88 @@ public class kNN2 {
             return temp;
         }
     }
-    /*
-     * find the class of item based on kNN (k=5)
-     * Parameters - Array of Euclidean distances of each row
-     * Return 0/1 based on 5 closest values
-     */
-
-    public static int GetClasses(Double[][] euclDist){
-
-        //Create a HashMap to negate loss of index
-        HashMap<Double, Integer> hash1 = new HashMap<Double, Integer>();
-        for(int y = 0; y<200; y++){
-            hash1.put(euclDist[y], y);
-        }
-
-        //Sort the array
-        Arrays.sort(euclDist);
-
-        //Variables for non/alchoholic count
-        int alc = 0;
-        int non = 0;
-        int[] trainingLabel = GetTrainingLabel();
-
-        //Take the top 5 items
-        for(int x = 0; x < 5; x++){
-            //Find the index of the item
-            int index = hash1.get(euclDist[x]);
-            //If the training label of that index is 0, increment non
-            if(trainingLabel[index] == 0){
-                non++;
-            }
-            //Otherwise, increment alc
-            else{
-                alc++;
-            }
-        }
-        //Return which class, based on alc & non counts
-        if(non > alc){return 0;}else{return 1;}
-    }
-    /*
-     * Write the String param to a file (output2.txt)
-     */
 
     /*
-     * Parameters - knn2 output, real classifications
-     * Returns percentage accuracy
+     * find the class of item based on kNN (k=1)
+     * Parameters - NN Value and index
+     * Return 0/1 based on closest value
      */
-    public static Double CompareLabels(int[] out, int[] tsl){
-        int y=0;
-        for(int x = 0; x < 200; x++){
-            if(out[x] == tsl[x]){
-                y++;
-            }
-        }
+    public static int GetClass(ArrayList<String> closestNeighbour, int[] testingLabels){
+        //int[] testLabels = GetTestLabel();
 
-        Double temp = (Double.parseDouble(String.valueOf(y)))*(Double.parseDouble("100"))/(Double.parseDouble("200"));
-        //System.out.println("Percentage: " + temp);
-        return temp;
+        /*for(String temp : closestNeighbour){
+            System.out.println(temp);
+        }
+        System.out.println(testLabels[Integer.parseInt(closestNeighbour.get(1))]);*/
+
+        return testingLabels[Integer.parseInt(closestNeighbour.get(1))];
     }
 
     /*
-     * Works out the difference of one test row to every other row in training data
-     * @calls - getClass
-     * @parameters - row of test data, complete train data, the array of column selection
-     * @return - classification of that row
+     * Works out the difference of the test data to the training data based on columnSelection
+     * Then finds the accuracy
+     * @calls GetTrainingData(), GetTestingData(), GetClass()
+     * @parameters - String column selection
+     * @return - array of total distances per row for that column selection
      */
-    public static void EuclideanCompare(){
+    public static Double GetAccuracyIndividual(String columnSelection, int[] testingLabels, Double[][] trainingData, Double[][] testingData){
+        //Double[][] trainingData = GetTrainingData();
+        //Double[][] testingData = GetTestingData();
 
-        Double[] differences = new Double[200];
-        for(int row = 0; row < 200; row++){
+        //System.out.println(columnSelection);
+        String[] columnArray = columnSelection.split(" ");
+        ArrayList<Double> rowAccuracy = new ArrayList<>();
+        ArrayList<Integer> classes = new ArrayList<>();
 
-            differences[row] = Double.parseDouble("0");
-            for(int column = 0; column < 61; column++){
-                if(columnArray[column] != 0){
-                    differences[row] = differences[row] + (Math.abs((trainingData[row][column]) - (testingData[column]) * Math.abs((trainingData[row][column]) - (testingData[column]))));
+        //Array list for closest train row of each test row
+        ArrayList<Integer> testRowClass = new ArrayList<>();
+
+        //For every test row
+        for(int testDataRow = 0; testDataRow < testingData.length; testDataRow++){
+            ArrayList<ArrayList<String>> trainRowDifferences = new ArrayList<>();
+
+            //For every train row
+            for(int trainDataRow = 0; trainDataRow < trainingData.length; trainDataRow++){
+                double rowDifference = Double.parseDouble("0");
+
+                //For every column
+                for(int column = 0; column < 61; column++){
+                    if(columnArray[column].equals("1")) {
+                        rowDifference += (Math.abs((trainingData[trainDataRow][column]) - (testingData[testDataRow][column]) * Math.abs((trainingData[trainDataRow][column]) - (testingData[testDataRow][column]))));
+                    }
                 }
+                //Find total train row distance
+                rowDifference = Math.sqrt(rowDifference);
+                ArrayList<String> temp = new ArrayList<>();
+                temp.add(String.valueOf(rowDifference));
+                temp.add(String.valueOf(trainDataRow));
+                //System.out.println(temp);
+                trainRowDifferences.add(temp);
             }
-            differences[row] = Math.sqrt(differences[row]);
+
+            //Adds closest neighbor to testing row
+            ArrayList<String> nn = new ArrayList<>();
+            nn.add("1000");
+            for(ArrayList<String> value : trainRowDifferences){
+                if(Double.parseDouble(value.get(0)) < Double.parseDouble(nn.get(0))){
+                    nn = value;
+                }
+
+            }
+            //System.out.println("Nearest Neighbor: " + nn);
+            //Add classification for every row of test data
+            testRowClass.add(GetClass(nn, testingLabels));
         }
+
+        //test accuracy
+        //int[] desiredLabels = GetTestLabel();
+        int count = 0;
+        for(int category = 0; category < testingLabels.length; category++){
+            if(testingLabels[category] == testRowClass.get(category)){
+                count++;
+            }
+        }
+        return ((double)count)/200*100;
     }
 
     /*
@@ -236,16 +241,97 @@ public class kNN2 {
      * @return - accuracy
      */
     public static void GAColumnComparison(){
+        //New Population
+        ArrayList<String> population = new ArrayList<String>();
 
+        Random rnd = new Random();
+
+        //Initial population of array
+        for(int x = 0; x < 100; x++){
+            String stringValue = "";
+
+            for(int y=0; y<61; y++){
+                int value = Math.abs(rnd.nextInt() % 2);
+                stringValue += String.valueOf(value) + " ";
+            }
+            population.add(stringValue);
+        }
+
+        int goalAccuracy = 90;
+        Double accuracy = Double.parseDouble("0");
+        int repeats = 0;
+        while(accuracy < goalAccuracy && repeats < 100){
+            ArrayList<Double> accuracies = GetAccuracy(population);
+            ArrayList<ArrayList<String>> columnAccuracies = new ArrayList<>();
+            for(int index = 0; index < accuracies.size(); index++){
+                ArrayList<String> temp = new ArrayList<>();
+                temp.add(population.get(index));
+                temp.add(String.valueOf(accuracies.get(index)));
+                columnAccuracies.add(temp);
+            }
+            population = Tournament(columnAccuracies);
+            population = Evolve(population);
+
+            //5% chance for mutation
+            int rand = rnd.nextInt(100);
+            if (rand <= 5) {
+                population = Mutate(population);
+            }
+            accuracy = GetBestAccuracy(GetAccuracy(population));
+            System.out.println(accuracy);
+            repeats++;
+        }
     }
 
+    public static ArrayList<Double> GetAccuracy(ArrayList<String> population){
+        Double[][] trainingData = GetTrainingData();
+        Double[][] testingData = GetTestingData();
+        int[] testingLabels = GetTestLabel();
+
+        System.out.println("Get Accuracy method");
+        //For every row in population, get accuracy
+        ArrayList<Double> selectionAccuracy = new ArrayList<>();
+        for(String columnSelection : population){
+            selectionAccuracy.add(GetAccuracyIndividual(columnSelection , testingLabels, trainingData, testingData));
+            //System.out.println(selectionAccuracy.get(selectionAccuracy.size()-1));
+        }
+        return selectionAccuracy;
+    }
+
+    public static Double GetBestAccuracy(ArrayList<Double> accuracies){
+        System.out.println("Get Best Accuracy method");
+        Collections.sort(accuracies);
+        return accuracies.get(0);
+    }
     /*
      * Picks new 100 based on their accuracy
      * @param - HashMap Key: accuracy, Value: column selection
      * @return - String ArrayList containing new parents
      */
-    public static void Tournament(){
-        
+    public static ArrayList<String> Tournament(ArrayList<ArrayList<String>> columnAccuracy){
+        System.out.println("Tournament method");
+        Random rnd1 = new Random();
+        ArrayList<String> population = new ArrayList<>();
+
+        for(int x = 0; x <100; x++) {
+            ArrayList<ArrayList<String>> temp = new ArrayList<>();
+            temp.add(columnAccuracy.get(rnd1.nextInt(columnAccuracy.size())));
+            temp.add(columnAccuracy.get(rnd1.nextInt(columnAccuracy.size())));
+            temp.add(columnAccuracy.get(rnd1.nextInt(columnAccuracy.size())));
+            //System.out.println("Rand 1: " + temp.get(0).get(0));
+            //System.out.println("Rand 2: " + temp.get(1).get(0));
+            //System.out.println("Rand 3: " + temp.get(2).get(0));
+
+            Double max = Double.parseDouble("0");
+            for (ArrayList<String> value : temp) {
+                //System.out.println(value.get(0));
+                if (Double.parseDouble(value.get(1)) > max) {
+                    population.add(value.get(0));
+                    max = Double.parseDouble(value.get(1));
+                }
+            }
+        }
+        return population;
     }
 
     /*
@@ -254,30 +340,39 @@ public class kNN2 {
      * @return - 2D array of new parents
      */
     public static ArrayList<String> Evolve(ArrayList<String> population){
+        Random rnd = new Random();
+
         ArrayList<String> parents = new ArrayList<String>();
+
+        //make it random
+        Collections.shuffle(population);
 
         //Split population into two
         ArrayList<String> firstHalf = new ArrayList<String>(population.subList(0, (population.size()/2)));
         ArrayList<String> secondHalf = new ArrayList<String>(population.subList(population.size()/2, population.size()));
 
         for(int index = 0; index < firstHalf.size(); index++){
-            //System.out.println("Original rows\nFirst Half: " + firstHalf.get(index) + "\nSecond half: " + secondHalf.get(index));
-            //Each half of first values
-            String ffhString = firstHalf.get(index).replaceAll("\\s+", "").substring(0, 30);
-            String fshString = firstHalf.get(index).replaceAll("\\s+", "").substring(30, 61);
+            //80% for each parent to crossover
+            int random = rnd.nextInt(100);
+            if(random <= 80) {
+                //Each half of first values
+                String ffhString = firstHalf.get(index).substring(0, 61);
+                String fshString = firstHalf.get(index).substring(61, 122);
 
-            //Each half of second values
-            String sfhString = secondHalf.get(index).replaceAll("\\s+", "").substring(0, 30);
-            String sshString = secondHalf.get(index).replaceAll("\\s+", "").substring(30, 61);
+                //Each half of second values
+                String sfhString = secondHalf.get(index).substring(0, 61);
+                String sshString = secondHalf.get(index).substring(61, 122);
 
-           // System.out.println(ffhString + " :" + fshString + " :" + sfhString + " :" + sshString);
-
-            parents.add(sfhString + fshString);
-            parents.add(ffhString + sshString);
-
-            //System.out.println("New Rows\nFirst Half: " + parents.get(parents.size()-2     ) + "\nSecond half: " + parents.get(parents.size()-1));
+                parents.add(sfhString + fshString);
+                parents.add(ffhString + sshString);
+            }
+            else{
+                parents.add(firstHalf.get(index));
+                parents.add(secondHalf.get(index));
+            }
+            //System.out.println("First Half: " + parents.get(parents.size()-2     ) + "\nSecond half: " + parents.get(parents.size()-1));
         }
-
+        System.out.println("Evolved");
 
         return parents;
     }
@@ -304,7 +399,7 @@ public class kNN2 {
                 }
             }
             population.add(x, newSelection);
-            System.out.println(population.get(x));
+            //System.out.println(population.get(x));
         }
         return population;
     }
