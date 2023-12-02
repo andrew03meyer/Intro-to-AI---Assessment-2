@@ -273,7 +273,7 @@ public class kNN2 {
             ArrayList<ArrayList<String>> selectionAccuracy = populationAndAccuracy(population, trainingData, testingData, testLabel, trainingLabel);
 
             //Call fitnessFunction
-            population = fitnessFunction(selectionAccuracy);
+            population = tournament(selectionAccuracy);
 
             //Call evolve
             population = evolve(population);
@@ -364,6 +364,29 @@ public class kNN2 {
         return parents;
     }
 
+    public static ArrayList<ArrayList<String>> tournament(ArrayList<ArrayList<String>> columnAccuracy){
+        Random rnd1 = new Random();
+        ArrayList<ArrayList<String>> population = new ArrayList<>();
+
+        for(int x = 0; x <100; x++) {
+            ArrayList<ArrayList<String>> temp = new ArrayList<>();
+            temp.add(columnAccuracy.get(rnd1.nextInt(columnAccuracy.size())));
+            temp.add(columnAccuracy.get(rnd1.nextInt(columnAccuracy.size())));
+            temp.add(columnAccuracy.get(rnd1.nextInt(columnAccuracy.size())));
+
+            ArrayList<String> str = new ArrayList<String>();
+            str.add("0");
+            str.add("0");
+
+            for(ArrayList<String> value : temp){
+                if(Double.parseDouble(value.get(1)) > Double.parseDouble(str.get(1))){
+                    str = value;
+                }
+            }
+            population.add(str);
+        }
+        return population;
+    }
     /*
      * Mix up 2 rows of data
      * @param - 2D array of parents
