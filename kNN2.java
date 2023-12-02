@@ -156,7 +156,7 @@ public class kNN2 {
      * Return 0/1 based on 5 closest values
      */
 
-    public static int getClass(Double[] euclDist){
+    public static int GetClasses(Double[][] euclDist){
 
         //Create a HashMap to negate loss of index
         HashMap<Double, Integer> hash1 = new HashMap<Double, Integer>();
@@ -215,7 +215,8 @@ public class kNN2 {
      * @parameters - row of test data, complete train data, the array of column selection
      * @return - classification of that row
      */
-    public static int EuclideanCompare(Double[] testingData, Double[][] trainingData, int[] columnArray){
+    public static void EuclideanCompare(){
+
         Double[] differences = new Double[200];
         for(int row = 0; row < 200; row++){
 
@@ -227,8 +228,6 @@ public class kNN2 {
             }
             differences[row] = Math.sqrt(differences[row]);
         }
-        int index = getClass(differences);
-        return index;
     }
 
     /*
@@ -246,7 +245,7 @@ public class kNN2 {
      * @return - String ArrayList containing new parents
      */
     public static void Tournament(){
-
+        
     }
 
     /*
