@@ -274,7 +274,7 @@ public class kNN2 {
 
             //Call fitnessFunction
             population = tournament(selectionAccuracy);
-
+            System.out.println(population.get(0));
             //Call evolve
             population = evolve(population);
 
@@ -364,7 +364,7 @@ public class kNN2 {
         return parents;
     }
 
-    public static ArrayList<ArrayList<String>> tournament(ArrayList<ArrayList<String>> columnAccuracy){
+    public static ArrayList<String> tournament(ArrayList<ArrayList<String>> columnAccuracy){
         Random rnd1 = new Random();
         ArrayList<ArrayList<String>> population = new ArrayList<>();
 
@@ -373,19 +373,29 @@ public class kNN2 {
             temp.add(columnAccuracy.get(rnd1.nextInt(columnAccuracy.size())));
             temp.add(columnAccuracy.get(rnd1.nextInt(columnAccuracy.size())));
             temp.add(columnAccuracy.get(rnd1.nextInt(columnAccuracy.size())));
+            System.out.println(temp.get(0).get(0));
+            System.out.println(temp.get(1).get(0));
+            System.out.println(temp.get(2).get(0));
 
             ArrayList<String> str = new ArrayList<String>();
             str.add("0");
             str.add("0");
 
             for(ArrayList<String> value : temp){
+                //System.out.println(value.get(0));
                 if(Double.parseDouble(value.get(1)) > Double.parseDouble(str.get(1))){
                     str = value;
                 }
             }
             population.add(str);
         }
-        return population;
+
+        ArrayList<String> pop = new ArrayList<>();
+        for(ArrayList<String> temp : population){
+            pop.add(temp.get(0));
+            //System.out.println(temp.get(0));
+        }
+        return pop;
     }
     /*
      * Mix up 2 rows of data
