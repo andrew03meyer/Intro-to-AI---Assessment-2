@@ -351,13 +351,14 @@ public class kNN2 {
             //80% for each parent to crossover
             int random = rnd.nextInt(100);
             if(random <= 80) {
+                random = rnd.nextInt(61)*2;
                 //Each half of first values
-                String ffhString = firstHalf.get(index).substring(0, 61);
-                String fshString = firstHalf.get(index).substring(61, 122);
+                String ffhString = firstHalf.get(index).substring(0, random);
+                String fshString = firstHalf.get(index).substring(random, 122);
 
                 //Each half of second values
-                String sfhString = secondHalf.get(index).substring(0, 61);
-                String sshString = secondHalf.get(index).substring(61, 122);
+                String sfhString = secondHalf.get(index).substring(0, random);
+                String sshString = secondHalf.get(index).substring(random, 122);
 
                 parents.add(sfhString + fshString);
                 parents.add(ffhString + sshString);
@@ -370,7 +371,7 @@ public class kNN2 {
 
         return parents;
     }
-    
+
     /*
      * Mutate 50 rows
      * @param - 2D ArrayList of columns
