@@ -158,6 +158,8 @@ public class kNN2 {
      * Creates new random 100 population
      * @calls - testFunction, picker, mutation
      * @return - accuracy
+     * Notes - make accuracies only compare changed columnSelections
+     *       - make Nearest neighbour k=5 method
      */
     public static void GAColumnComparison(){
         //New Population
@@ -195,10 +197,10 @@ public class kNN2 {
             population = Evolve(population);
 
             //5% chance for mutation
-            int rand = rnd.nextInt(100);
-            if (rand <= 20) {
-                population = Mutate(population);
-            }
+            //int rand = rnd.nextInt(100);
+            //if (rand <= 100) {
+                population = NewMutate(population);
+            //}
 
             accuracies = GetAccuracy(population);
             accuracy = GetBestAccuracy(accuracies);
@@ -240,8 +242,8 @@ public class kNN2 {
     /*
      * Works out the difference of the test data to the training data based on columnSelection
      * Then finds the accuracy
-     * @calls GetTrainingData(), GetTestingData(), GetClass()
-     * @parameters - String column selection
+     * @calls GetClass()
+     * @parameters - String column selection, testLabels, TrainingData, TestingData
      * @return - array of total distances per row for that column selection
      */
     public static Double GetAccuracyIndividual(String columnSelection, int[] testingLabels, Double[][] trainingData, Double[][] testingData){
@@ -340,9 +342,6 @@ public class kNN2 {
 
         ArrayList<String> parents = new ArrayList<String>();
 
-        //make it random
-        //Collections.shuffle(population);
-
         //Split population into two
         ArrayList<String> firstHalf = new ArrayList<String>(population.subList(0, (population.size()/2)));
         ArrayList<String> secondHalf = new ArrayList<String>(population.subList(population.size()/2, population.size()));
@@ -379,8 +378,9 @@ public class kNN2 {
      */
     public static ArrayList<String> Mutate(ArrayList<String> population){
         for(int x = 0; x < 5; x++){
-            //System.out.println(population.get(x));
-            String selection = population.remove(x).replaceAll("\\s+", "");
+            Random rnd = new Random();
+            int random = rnd.nextInt(population.size());
+            String selection = population.remove(random).replaceAll("\\s+", "");
             String newSelection = "";
             //For each character in that selection
             for(char value : selection.toCharArray()){
@@ -391,9 +391,42 @@ public class kNN2 {
                     newSelection += "0 ";
                 }
             }
-            population.add(x, newSelection);
+            population.add(random, newSelection);
         }
         return population;
+    }
+
+    public static ArrayList<String> NewMutate(ArrayList<String> population){
+        //For every row
+        ArrayList<String> newPopulation = new ArrayList<>();
+        for(String row : population) {
+            //population.remove(row);
+            String concatenation = "";
+
+            //Chance to mutate
+            Random rnd = new Random();
+            int random = rnd.nextInt(100);
+            if(random <= 5) {
+                char[] charArray = row.toCharArray();
+                int randChar = rnd.nextInt(61)*2;
+                if(charArray[randChar] == '0'){
+                    charArray[randChar] = '1';
+                }
+                else{
+                    charArray[randChar] = '0';
+                }
+
+                //Concatenation of char array
+                for(char c : charArray){
+                    concatenation += c;
+                }
+            }
+            else{
+                concatenation = row;
+            }
+            newPopulation.add(concatenation);
+        }
+        return newPopulation;
     }
 }
 
