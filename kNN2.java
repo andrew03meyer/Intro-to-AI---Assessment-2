@@ -429,4 +429,3 @@ public class kNN2 {
         return newPopulation;
     }
 }
-
