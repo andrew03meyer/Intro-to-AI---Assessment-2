@@ -7,68 +7,66 @@ import java.io.File;
 import java.io.FileWriter;
 
 public class kNN2 {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         GAColumnComparison();
     }
 
-    public static Double[][] GetTrainingData(){
+    public static Double[][] GetTrainingData() {
         Double[][] trainingData = new Double[200][61];
 
-        try{
+        try {
             File trainingFile = new File("train_data.txt");
             Scanner tfScanner = new Scanner(trainingFile);
 
             int rowIndex = 0;
             int columnIndex;
 
-            while(tfScanner.hasNextLine()){
+            while (tfScanner.hasNextLine()) {
                 columnIndex = 0;
                 //Split line by space and insert into the 2D array
                 String[] temp = tfScanner.nextLine().split(" ");
-                for(String item : temp){
+                for (String item : temp) {
                     trainingData[rowIndex][columnIndex] = Double.parseDouble(item);
                     columnIndex++;
                 }
                 rowIndex++;
             }
             tfScanner.close();
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Exception: " + e);
         }
         return trainingData;
     }
 
-    public static Double[][] GetTestingData(){
+    public static Double[][] GetTestingData() {
         Double[][] testingData = new Double[200][61];
 
-        try{
+        try {
             File testingFile = new File("test_data.txt");
             Scanner tsfScanner = new Scanner(testingFile);
 
             int rowIndex = 0;
             int columnIndex;
 
-            while(tsfScanner.hasNextLine()){
+            while (tsfScanner.hasNextLine()) {
                 columnIndex = 0;
                 //Split line by space and insert into the 2D array
                 String[] temp = tsfScanner.nextLine().split(" ");
-                for(String item : temp){
+                for (String item : temp) {
                     testingData[rowIndex][columnIndex] = Double.parseDouble(item);
                     columnIndex++;
                 }
                 rowIndex++;
             }
             tsfScanner.close();
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Exception: " + e);
         }
         return testingData;
     }
 
-    public static int[] GetTrainingLabel(){
-        try{
+    public static int[] GetTrainingLabel() {
+        try {
             File trainingLabelFile = new File("train_label.txt");
             Scanner tlScanner = new Scanner(trainingLabelFile);
 
@@ -76,21 +74,20 @@ public class kNN2 {
             int index = 0;
             int[] trainingLabels = new int[200];
 
-            for(String items:temp){
+            for (String items : temp) {
                 trainingLabels[index] = Integer.parseInt(items);
                 index++;
             }
             tlScanner.close();
             return trainingLabels;
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Exception: " + e);
             return new int[]{};
         }
     }
 
-    public static int[] GetTestLabel(){
-        try{
+    public static int[] GetTestLabel() {
+        try {
             File testLabelFile = new File("test_label.txt");
             Scanner tslScanner = new Scanner(testLabelFile);
 
@@ -98,33 +95,31 @@ public class kNN2 {
             int index = 0;
             int[] testLabels = new int[200];
 
-            for(String items:temp){
+            for (String items : temp) {
                 testLabels[index] = Integer.parseInt(items);
                 index++;
             }
             tslScanner.close();
             return testLabels;
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Exception: " + e);
             return new int[]{};
         }
     }
 
-    public static void WriteClassData(String itemClass){
-        try{
+    public static void WriteClassData(String itemClass) {
+        try {
             File classData = new File("output2.txt");
             FileWriter fwr = new FileWriter(classData);
             fwr.write(itemClass);
             fwr.close();
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("File already exists");
         }
     }
 
-    public static int[] GetOutputLabel(){
-        try{
+    public static int[] GetOutputLabel() {
+        try {
             File outLabelFile = new File("output2.txt");
             Scanner outScanner = new Scanner(outLabelFile);
 
@@ -132,14 +127,13 @@ public class kNN2 {
             int index = 0;
             int[] outLabels = new int[200];
 
-            for(String items:temp){
+            for (String items : temp) {
                 outLabels[index] = Integer.parseInt(items);
                 index++;
             }
             outScanner.close();
             return outLabels;
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Exception: " + e);
             return new int[]{};
         }
@@ -150,7 +144,7 @@ public class kNN2 {
      * Parameters - NN Value and index
      * Return 0/1 based on closest value
      */
-    public static int GetClass(ArrayList<String> closestNeighbour, int[] testingLabels){
+    public static int GetClass(ArrayList<String> closestNeighbour, int[] testingLabels) {
         return testingLabels[Integer.parseInt(closestNeighbour.get(1))];
     }
 
@@ -161,17 +155,17 @@ public class kNN2 {
      * Notes - make accuracies only compare changed columnSelections
      *       - make Nearest neighbour k=5 method
      */
-    public static void GAColumnComparison(){
+    public static void GAColumnComparison() {
         //New Population
         ArrayList<String> population = new ArrayList<String>();
 
         Random rnd = new Random();
 
         //Initial population of array
-        for(int x = 0; x < 100; x++){
+        for (int x = 0; x < 100; x++) {
             String stringValue = "";
 
-            for(int y=0; y<61; y++){
+            for (int y = 0; y < 61; y++) {
                 int value = Math.abs(rnd.nextInt() % 2);
                 stringValue += String.valueOf(value) + " ";
             }
@@ -188,9 +182,9 @@ public class kNN2 {
         //Initial accuracy
         ArrayList<Double> accuracies = GetAccuracy(population, trainingData, testingData, testingLabels);
 
-        while(accuracy < goalAccuracy && repeats < 100){
+        while (accuracy < goalAccuracy && repeats < 100) {
             ArrayList<ArrayList<String>> columnAccuracies = new ArrayList<>();
-            for(int index = 0; index < accuracies.size(); index++){
+            for (int index = 0; index < accuracies.size(); index++) {
                 ArrayList<String> temp = new ArrayList<>();
                 temp.add(population.get(index));
                 temp.add(String.valueOf(accuracies.get(index)));
@@ -217,32 +211,24 @@ public class kNN2 {
         }
     }
 
-    public static ArrayList<Double> GetAccuracy(ArrayList<String> population, Double[][] trainingData, Double[][]testingData, int[]testingLabels){
-
-        //measuring time
-        Double timeStart = Double.parseDouble(String.valueOf(System.nanoTime()));
+    public static ArrayList<Double> GetAccuracy(ArrayList<String> population, Double[][] trainingData, Double[][] testingData, int[] testingLabels) {
 
         //For every row in population, get accuracy
         ArrayList<Double> selectionAccuracy = new ArrayList<>();
-        for(String columnSelection : population){
-            //System.out.println("Pop: " + population.size());
-            selectionAccuracy.add(GetAccuracyIndividual(columnSelection , testingLabels, trainingData, testingData));
+        for (String columnSelection : population) {
+            ArrayList<ArrayList<String>> testRowDistances = EuclideanDistance(columnSelection, testingLabels, trainingData, testingData);
+            String closestNeighbour = GetFiveNN(testRowDistances);
         }
-
-        //time
-        Double timeFinish = Double.parseDouble(String.valueOf(System.nanoTime()));
-        System.out.println("Time taken: " + (timeFinish-timeStart)/1000000000);
 
         return selectionAccuracy;
     }
 
-    public static void PrintRepeats(ArrayList<String> population){
+    public static void PrintRepeats(ArrayList<String> population) {
         HashMap<String, Integer> hash1 = new HashMap<>();
-        for(String temp : population){
-            if(hash1.containsKey(temp)){
-                hash1.put(temp, hash1.get(temp)+1);
-            }
-            else{
+        for (String temp : population) {
+            if (hash1.containsKey(temp)) {
+                hash1.put(temp, hash1.get(temp) + 1);
+            } else {
                 hash1.put(temp, 1);
             }
         }
@@ -256,59 +242,70 @@ public class kNN2 {
      * @parameters - String column selection, testLabels, TrainingData, TestingData
      * @return - accuracy of that column
      */
-    public static Double GetAccuracyIndividual(String columnSelection, int[] testingLabels, Double[][] trainingData, Double[][] testingData){
-        String[] columnArray = columnSelection.split(" ");
-        ArrayList<Double> rowAccuracy = new ArrayList<>();
-        ArrayList<Integer> classes = new ArrayList<>();
+    public static ArrayList<ArrayList<String>> EuclideanDistance(String columnSelection, int[] testingLabels, Double[][] trainingData, Double[][] testingData) {
 
-        //Array list for closest train row of each test row
-        ArrayList<Integer> testRowClass = new ArrayList<>();
+        String[] columnArray = columnSelection.split(" ");
+
+        //For every test row, an array of distances
+        ArrayList<ArrayList<String>>testRowDistances = new ArrayList<>();
 
         //For every test row
-        for(int testDataRow = 0; testDataRow < testingData.length; testDataRow++){
-            ArrayList<ArrayList<String>> trainRowDifferences = new ArrayList<>();
+        for (int testDataRow = 0; testDataRow < testingData.length; testDataRow++) {
+            ArrayList<String> trainRowDifferences = new ArrayList<>();
 
             //For every train row
-            for(int trainDataRow = 0; trainDataRow < trainingData.length; trainDataRow++){
+            for (int trainDataRow = 0; trainDataRow < trainingData.length; trainDataRow++) {
                 double rowDifference = Double.parseDouble("0");
 
                 //For every column
-                for(int column = 0; column < 61; column++){
-                    if(columnArray[column].equals("1")) {
+                for (int column = 0; column < 61; column++) {
+                    if (columnArray[column].equals("1")) {
                         rowDifference += (Math.abs((trainingData[trainDataRow][column]) - (testingData[testDataRow][column]) * Math.abs((trainingData[trainDataRow][column]) - (testingData[testDataRow][column]))));
                     }
                 }
+
                 //Find total train row distance
                 rowDifference = Math.sqrt(rowDifference);
-                ArrayList<String> temp = new ArrayList<>();
-                temp.add(String.valueOf(rowDifference));
-                temp.add(String.valueOf(trainDataRow));
-                trainRowDifferences.add(temp);
+                trainRowDifferences.add(String.valueOf(testDataRow));
+                trainRowDifferences.add(String.valueOf(rowDifference));
             }
-
-            //Adds closest neighbor to testing row
-            ArrayList<String> nn = new ArrayList<>();
-            nn.add("1000");
-            for(ArrayList<String> value : trainRowDifferences){
-                if(Double.parseDouble(value.get(0)) < Double.parseDouble(nn.get(0))){
-                    nn = value;
-                }
-
-            }
-            //Add classification for every row of test data
-            testRowClass.add(GetClass(nn, testingLabels));
+            testRowDistances.add(trainRowDifferences);
         }
-
-        //test accuracy
-        int count = 0;
-        for(int category = 0; category < testingLabels.length; category++){
-            if(testingLabels[category] == testRowClass.get(category)){
-                count++;
-            }
-        }
-        return ((double)count)/200*100;
+        return testRowDistances;
     }
 
+
+    public static void GetFiveNN(ArrayList<ArrayList<String>> testRowDistances){
+        ArrayList<ArrayList<String>> top5 = new ArrayList<>();
+        //top5.add(testRowDistances.get(0));
+        ArrayList<String> highest = new ArrayList<>();
+        highest.add("temp");
+        highest.add("-1");
+
+
+        for(ArrayList<String> testRow : testRowDistances){
+            if(top5.size() == 5) {
+                //If the new value is less than highest value
+                if (Double.parseDouble(testRow.get(1)) < Double.parseDouble(highest.get(1))){
+                    top5.add(top5.indexOf(highest), testRow);
+
+                    //find new highest
+                    for (ArrayList<String> temp : top5) {
+                        if(Double.parseDouble(temp.get(1)) > Double.parseDouble(highest.get(1))){
+                            highest = temp;
+                        }
+                    }
+                }
+            }
+            else{
+                top5.add(testRow);
+                //if the new value is the highest, set it
+                if(Double.parseDouble(testRow.get(1)) > Double.parseDouble(highest.get(1))){
+                    highest = testRow;
+                }
+            }
+        }
+    }
     public static Double GetBestAccuracy(ArrayList<Double> accuracies){
         Double best = Double.parseDouble("0");
         for(Double temp : accuracies){
