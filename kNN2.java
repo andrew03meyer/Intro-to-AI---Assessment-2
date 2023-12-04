@@ -200,10 +200,10 @@ public class kNN2 {
             population = Evolve(population);
 
             //5% chance for mutation
-            //int rand = rnd.nextInt(100);
-            //if (rand <= 100) {
+            int rand = rnd.nextInt(100);
+            if (rand <= 20) {
                 population = NewMutate(population);
-            //}
+            }
 
             accuracies = GetAccuracy(population, trainingData, testingData, testingLabels);
             accuracy = GetBestAccuracy(accuracies);
@@ -211,6 +211,7 @@ public class kNN2 {
             //GetBestAccuracies() Shuffles in reverse order
             //Collections.shuffle(population);
             PrintRepeats(population);
+            System.out.println("Population 0: " + population.get(0));
             System.out.println("Accuracy: " + accuracy);
             repeats++;
         }
@@ -309,9 +310,13 @@ public class kNN2 {
     }
 
     public static Double GetBestAccuracy(ArrayList<Double> accuracies){
-        accuracies.sort(Collections.reverseOrder());
-        System.out.println(accuracies);
-        return accuracies.get(0);
+        Double best = Double.parseDouble("0");
+        for(Double temp : accuracies){
+            if(temp > best) {
+                best = temp;
+            }
+        }
+        return best;
     }
     /*
      * Picks new 100 based on their accuracy
@@ -356,20 +361,26 @@ public class kNN2 {
         ArrayList<String> secondHalf = new ArrayList<String>(population.subList(population.size()/2, population.size()));
 
         for(int index = 0; index < firstHalf.size(); index++){
+            //System.out.println("Full row: " + firstHalf.get(index));
+            //System.out.println("Full row: " + secondHalf.get(index));
             //80% for each parent to crossover
             int random = rnd.nextInt(100);
             if(random <= 80) {
+
                 random = rnd.nextInt(61)*2;
                 //Each half of first values
                 String ffhString = firstHalf.get(index).substring(0, random);
                 String fshString = firstHalf.get(index).substring(random, 122);
+                //System.out.println("First pop:  " + ffhString + "|" + fshString);
 
                 //Each half of second values
                 String sfhString = secondHalf.get(index).substring(0, random);
                 String sshString = secondHalf.get(index).substring(random, 122);
+                //System.out.println("Second pop: " + sfhString + "|" + sshString);
 
                 parents.add(sfhString + fshString);
                 parents.add(ffhString + sshString);
+                //System.out.println("First pop:  " + sfhString+fshString + "\nSecond pop: " + ffhString+sshString);
             }
             else{
                 parents.add(firstHalf.get(index));
@@ -416,6 +427,7 @@ public class kNN2 {
             Random rnd = new Random();
             int random = rnd.nextInt(100);
             if(random <= 5) {
+                //System.out.println("Row before: " + row);
                 char[] charArray = row.toCharArray();
                 int randChar = rnd.nextInt(61)*2;
                 if(charArray[randChar] == '0'){
@@ -429,6 +441,7 @@ public class kNN2 {
                 for(char c : charArray){
                     concatenation += c;
                 }
+                //System.out.println("Row after: " + concatenation);
             }
             else{
                 concatenation = row;
