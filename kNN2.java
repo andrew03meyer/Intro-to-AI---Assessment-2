@@ -181,9 +181,12 @@ public class kNN2 {
         int goalAccuracy = 90;
         Double accuracy = Double.parseDouble("0");
         int repeats = 0;
+        Double[][] trainingData = GetTrainingData();
+        Double[][] testingData = GetTestingData();
+        int[] testingLabels = GetTestLabel();
 
         //Initial accuracy
-        ArrayList<Double> accuracies = GetAccuracy(population);
+        ArrayList<Double> accuracies = GetAccuracy(population, trainingData, testingData, testingLabels);
 
         while(accuracy < goalAccuracy && repeats < 100){
             ArrayList<ArrayList<String>> columnAccuracies = new ArrayList<>();
@@ -202,7 +205,7 @@ public class kNN2 {
                 population = NewMutate(population);
             //}
 
-            accuracies = GetAccuracy(population);
+            accuracies = GetAccuracy(population, trainingData, testingData, testingLabels);
             accuracy = GetBestAccuracy(accuracies);
 
             //GetBestAccuracies() Shuffles in reverse order
@@ -213,16 +216,22 @@ public class kNN2 {
         }
     }
 
-    public static ArrayList<Double> GetAccuracy(ArrayList<String> population){
-        Double[][] trainingData = GetTrainingData();
-        Double[][] testingData = GetTestingData();
-        int[] testingLabels = GetTestLabel();
+    public static ArrayList<Double> GetAccuracy(ArrayList<String> population, Double[][] trainingData, Double[][]testingData, int[]testingLabels){
+
+        //measuring time
+        Double timeStart = Double.parseDouble(String.valueOf(System.nanoTime()));
 
         //For every row in population, get accuracy
         ArrayList<Double> selectionAccuracy = new ArrayList<>();
         for(String columnSelection : population){
+            //System.out.println("Pop: " + population.size());
             selectionAccuracy.add(GetAccuracyIndividual(columnSelection , testingLabels, trainingData, testingData));
         }
+
+        //time
+        Double timeFinish = Double.parseDouble(String.valueOf(System.nanoTime()));
+        System.out.println("Time taken: " + (timeFinish-timeStart)/1000000000);
+
         return selectionAccuracy;
     }
 
