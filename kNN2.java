@@ -254,7 +254,7 @@ public class kNN2 {
      * Then finds the accuracy
      * @calls GetClass()
      * @parameters - String column selection, testLabels, TrainingData, TestingData
-     * @return - array of total distances per row for that column selection
+     * @return - accuracy of that column
      */
     public static Double GetAccuracyIndividual(String columnSelection, int[] testingLabels, Double[][] trainingData, Double[][] testingData){
         String[] columnArray = columnSelection.split(" ");
