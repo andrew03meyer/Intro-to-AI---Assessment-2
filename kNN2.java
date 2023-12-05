@@ -168,8 +168,8 @@ public class kNN2 {
         Random rnd = new Random();
 
         //Initial population of array
-        population.add("0 0 0 0 0 1 1 1 0 0 0 0 0 0 1 0 1 0 0 1 0 0 1 1 1 1 0 1 1 0 1 1 0 1 0 0 0 1 1 0 1 0 1 1 1 1 0 0 0 0 0 0 1 1 1 1 0 0 1 0 1 ");
-        for(int x = 0; x < 99; x++){
+        //population.add("0 0 0 0 0 1 1 1 0 0 0 0 0 0 1 0 1 0 0 1 0 0 1 1 1 1 0 1 1 0 1 1 0 1 0 0 0 1 1 0 1 0 1 1 1 1 0 0 0 0 0 0 1 1 1 1 0 0 1 0 1 ");
+        for(int x = 0; x < 100; x++){
             String stringValue = "";
 
             for(int y=0; y<61; y++){
@@ -179,16 +179,18 @@ public class kNN2 {
             population.add(stringValue);
         }
 
-        int goalAccuracy = 90;
+        int goalAccuracy = 95;
         Double accuracy = Double.parseDouble("0");
         int repeats = 0;
         Double[][] trainingData = GetTrainingData();
         Double[][] testingData = GetTestingData();
         int[] testingLabels = GetTestLabel();
+        int[] trainingLabels = GetTrainingLabel();
+
+        //System.out.println(GetAccuracyIndividual(population.get(0), trainingLabels, testingLabels, trainingData, testingData));
 
         //Initial accuracy
-        ArrayList<Double> accuracies = GetAccuracy(population, trainingData, testingData, testingLabels);
-        System.out.println(GetAccuracyIndividual(population.get(0), testingLabels, trainingData, testingData));
+        ArrayList<Double> accuracies = GetAccuracy(population, trainingData, testingData, testingLabels, trainingLabels);
 
         while(accuracy < goalAccuracy && repeats < 100){
             ArrayList<ArrayList<String>> columnAccuracies = new ArrayList<>();
@@ -198,24 +200,31 @@ public class kNN2 {
                 temp.add(String.valueOf(accuracies.get(index)));
                 columnAccuracies.add(temp);
             }
+
+            //Tournament, Evolution, and Mutation
             population = Tournament(columnAccuracies);
             population = Evolve(population);
             population = Mutate(population);
 
-            accuracies = GetAccuracy(population, trainingData, testingData, testingLabels);
+            //Accuracy for whole population
+            accuracies = GetAccuracy(population, trainingData, testingData, testingLabels, trainingLabels);
+
+            //Best accuracy
             accuracy = GetBestAccuracy(accuracies);
 
-            //GetBestAccuracies() Shuffles in reverse order
-            //Collections.shuffle(population);
-            PrintRepeats(population);
             System.out.println(accuracies);
             //System.out.println("Population 0: " + population.get(0));
+            printBest(population, accuracy, accuracies);
             System.out.println("Accuracy: " + accuracy);
             repeats++;
         }
     }
 
-    public static ArrayList<Double> GetAccuracy(ArrayList<String> population, Double[][] trainingData, Double[][]testingData, int[]testingLabels){
+    public static void printBest(ArrayList<String> population, Double accuracy, ArrayList<Double> accuracies){
+        int index = accuracies.indexOf(accuracy);
+        System.out.println(population.get(index));
+    }
+    public static ArrayList<Double> GetAccuracy(ArrayList<String> population, Double[][] trainingData, Double[][]testingData, int[]testingLabels, int[] trainingLabels){
 
         //measuring time
         Double timeStart = Double.parseDouble(String.valueOf(System.nanoTime()));
@@ -224,7 +233,7 @@ public class kNN2 {
         ArrayList<Double> selectionAccuracy = new ArrayList<>();
         for(String columnSelection : population){
             //System.out.println("Pop: " + population.size());
-            selectionAccuracy.add(GetAccuracyIndividual(columnSelection , testingLabels, trainingData, testingData));
+            selectionAccuracy.add(GetAccuracyIndividual(columnSelection , trainingLabels, testingLabels, trainingData, testingData));
         }
 
         //time
@@ -255,7 +264,7 @@ public class kNN2 {
      * @parameters - String column selection, testLabels, TrainingData, TestingData
      * @return - accuracy of that column
      */
-    public static Double GetAccuracyIndividual(String columnSelection, int[] testingLabels, Double[][] trainingData, Double[][] testingData){
+    public static Double GetAccuracyIndividual(String columnSelection, int[] trainingLabels, int[] testingLabels, Double[][] trainingData, Double[][] testingData){
         String[] columnArray = columnSelection.split(" ");
         ArrayList<Double> rowAccuracy = new ArrayList<>();
         ArrayList<Integer> classes = new ArrayList<>();
@@ -274,11 +283,11 @@ public class kNN2 {
                 //For every column
                 for(int column = 0; column < 61; column++){
                     if(columnArray[column].equals("1")) {
-                        rowDifference += (Math.abs((trainingData[trainDataRow][column]) - (testingData[testDataRow][column]) * Math.abs((trainingData[trainDataRow][column]) - (testingData[testDataRow][column]))));
+                        rowDifference += Math.abs((trainingData[trainDataRow][column]) - (testingData[testDataRow][column]));
                     }
                 }
                 //Find total train row distance
-                rowDifference = Math.sqrt(rowDifference);
+                //rowDifference = Math.sqrt(rowDifference);
                 ArrayList<String> temp = new ArrayList<>();
                 temp.add(String.valueOf(rowDifference));
                 temp.add(String.valueOf(trainDataRow));
@@ -295,7 +304,7 @@ public class kNN2 {
 
             }
             //Add classification for every row of test data
-            testRowClass.add(GetClass(nn, testingLabels));
+            testRowClass.add(GetClass(nn, trainingLabels));
         }
 
         //test accuracy
@@ -417,7 +426,6 @@ public class kNN2 {
                 for(char c : charArray){
                     concatenation += c;
                 }
-                //System.out.println("Row after: " + concatenation);
             }
             else{
                 concatenation = row;
