@@ -139,14 +139,7 @@ public class kNN2 {
         }
     }
 
-    /*
-     * find the class of item based on kNN (k=1)
-     * Parameters - NN Value and index
-     * Return 0/1 based on closest value
-     */
-    public static int GetClass(ArrayList<String> closestNeighbour, int[] testingLabels) {
-        return testingLabels[Integer.parseInt(closestNeighbour.get(1))];
-    }
+
 
     /*
      * Creates new random 100 population
@@ -216,8 +209,8 @@ public class kNN2 {
         //For every row in population, get accuracy
         ArrayList<Double> selectionAccuracy = new ArrayList<>();
         for (String columnSelection : population) {
-            ArrayList<ArrayList<String>> testRowDistances = EuclideanDistance(columnSelection, testingLabels, trainingData, testingData);
-            String closestNeighbour = GetFiveNN(testRowDistances);
+            ArrayList<ArrayList<String>> testRowDistances = EuclideanDistance(columnSelection, trainingData, testingData);
+            ArrayList<ArrayList<String>> closestNeighbour = GetFiveNN(testRowDistances);
         }
 
         return selectionAccuracy;
@@ -242,7 +235,7 @@ public class kNN2 {
      * @parameters - String column selection, testLabels, TrainingData, TestingData
      * @return - accuracy of that column
      */
-    public static ArrayList<ArrayList<String>> EuclideanDistance(String columnSelection, int[] testingLabels, Double[][] trainingData, Double[][] testingData) {
+    public static ArrayList<ArrayList<String>> EuclideanDistance(String columnSelection, Double[][] trainingData, Double[][] testingData) {
 
         String[] columnArray = columnSelection.split(" ");
 
@@ -260,7 +253,7 @@ public class kNN2 {
                 //For every column
                 for (int column = 0; column < 61; column++) {
                     if (columnArray[column].equals("1")) {
-                        rowDifference += (Math.abs((trainingData[trainDataRow][column]) - (testingData[testDataRow][column]) * Math.abs((trainingData[trainDataRow][column]) - (testingData[testDataRow][column]))));
+                        rowDifference += Math.abs((trainingData[trainDataRow][column]) - (testingData[testDataRow][column]));
                     }
                 }
 
@@ -275,13 +268,13 @@ public class kNN2 {
     }
 
 
-    public static void GetFiveNN(ArrayList<ArrayList<String>> testRowDistances){
+    public static ArrayList<ArrayList<String>> GetFiveNN(ArrayList<ArrayList<String>> testRowDistances){
         ArrayList<ArrayList<String>> top5 = new ArrayList<>();
         //top5.add(testRowDistances.get(0));
         ArrayList<String> highest = new ArrayList<>();
         highest.add("temp");
         highest.add("-1");
-
+        int index=0;
 
         for(ArrayList<String> testRow : testRowDistances){
             if(top5.size() == 5) {
@@ -293,6 +286,7 @@ public class kNN2 {
                     for (ArrayList<String> temp : top5) {
                         if(Double.parseDouble(temp.get(1)) > Double.parseDouble(highest.get(1))){
                             highest = temp;
+                            highest.add(String.valueOf(index));
                         }
                     }
                 }
@@ -302,9 +296,33 @@ public class kNN2 {
                 //if the new value is the highest, set it
                 if(Double.parseDouble(testRow.get(1)) > Double.parseDouble(highest.get(1))){
                     highest = testRow;
+                    highest.add(String.valueOf(index));
                 }
             }
+            index++;
         }
+
+        return top5;
+    }
+
+    /*
+     * find the class of item based on kNN (k=5)
+     * Parameters - NN Values and testlabels
+     * Return 0/1 based on closest value
+     */
+    public static int GetClass(ArrayList<ArrayList<String>> NearestNeighbour, int[] testLabels){
+        int non=0;
+        int alc=0;
+
+        for(ArrayList<String> temp : NearestNeighbour){
+            if(testLabels[Integer.parseInt(temp.get(2))] == 0){
+                non++;
+            }
+            else{
+                alc++;
+            }
+        }
+        return Math.max(non, alc);
     }
     public static Double GetBestAccuracy(ArrayList<Double> accuracies){
         Double best = Double.parseDouble("0");
