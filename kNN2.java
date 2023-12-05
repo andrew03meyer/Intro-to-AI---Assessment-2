@@ -198,12 +198,7 @@ public class kNN2 {
             }
             population = Tournament(columnAccuracies);
             population = Evolve(population);
-
-            //5% chance for mutation
-            int rand = rnd.nextInt(100);
-            if (rand <= 20) {
-                population = NewMutate(population);
-            }
+            population = Mutate(population);
 
             accuracies = GetAccuracy(population, trainingData, testingData, testingLabels);
             accuracy = GetBestAccuracy(accuracies);
@@ -211,7 +206,8 @@ public class kNN2 {
             //GetBestAccuracies() Shuffles in reverse order
             //Collections.shuffle(population);
             PrintRepeats(population);
-            System.out.println("Population 0: " + population.get(0));
+            System.out.println(accuracies);
+            //System.out.println("Population 0: " + population.get(0));
             System.out.println("Accuracy: " + accuracy);
             repeats++;
         }
@@ -246,6 +242,7 @@ public class kNN2 {
                 hash1.put(temp, 1);
             }
         }
+        System.out.println(hash1.keySet());
         System.out.println(hash1.values());
     }
 
@@ -359,6 +356,8 @@ public class kNN2 {
         //Split population into two
         ArrayList<String> firstHalf = new ArrayList<String>(population.subList(0, (population.size()/2)));
         ArrayList<String> secondHalf = new ArrayList<String>(population.subList(population.size()/2, population.size()));
+        //Collections.shuffle(firstHalf);
+        //Collections.shuffle(secondHalf);
 
         for(int index = 0; index < firstHalf.size(); index++){
             //System.out.println("Full row: " + firstHalf.get(index));
@@ -391,32 +390,7 @@ public class kNN2 {
         return parents;
     }
 
-    /*
-     * Mutate 50 rows
-     * @param - 2D ArrayList of columns
-     * @return - 2D ArrayList of mutated columns
-     */
     public static ArrayList<String> Mutate(ArrayList<String> population){
-        for(int x = 0; x < 5; x++){
-            Random rnd = new Random();
-            int random = rnd.nextInt(population.size());
-            String selection = population.remove(random).replaceAll("\\s+", "");
-            String newSelection = "";
-            //For each character in that selection
-            for(char value : selection.toCharArray()){
-                if(value == '0'){
-                    newSelection += "1 ";
-                }
-                else{
-                    newSelection += "0 ";
-                }
-            }
-            population.add(random, newSelection);
-        }
-        return population;
-    }
-
-    public static ArrayList<String> NewMutate(ArrayList<String> population){
         //For every row
         ArrayList<String> newPopulation = new ArrayList<>();
         for(String row : population) {
