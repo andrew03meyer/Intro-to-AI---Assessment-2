@@ -168,7 +168,8 @@ public class kNN2 {
         Random rnd = new Random();
 
         //Initial population of array
-        for(int x = 0; x < 100; x++){
+        population.add("0 0 0 0 0 1 1 1 0 0 0 0 0 0 1 0 1 0 0 1 0 0 1 1 1 1 0 1 1 0 1 1 0 1 0 0 0 1 1 0 1 0 1 1 1 1 0 0 0 0 0 0 1 1 1 1 0 0 1 0 1 ");
+        for(int x = 0; x < 99; x++){
             String stringValue = "";
 
             for(int y=0; y<61; y++){
@@ -187,6 +188,7 @@ public class kNN2 {
 
         //Initial accuracy
         ArrayList<Double> accuracies = GetAccuracy(population, trainingData, testingData, testingLabels);
+        System.out.println(GetBestAccuracy(accuracies));
 
         while(accuracy < goalAccuracy && repeats < 100){
             ArrayList<ArrayList<String>> columnAccuracies = new ArrayList<>();
