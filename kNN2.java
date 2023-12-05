@@ -188,7 +188,7 @@ public class kNN2 {
 
         //Initial accuracy
         ArrayList<Double> accuracies = GetAccuracy(population, trainingData, testingData, testingLabels);
-        System.out.println(GetBestAccuracy(accuracies));
+        System.out.println(GetAccuracyIndividual(population.get(0), testingLabels, trainingData, testingData));
 
         while(accuracy < goalAccuracy && repeats < 100){
             ArrayList<ArrayList<String>> columnAccuracies = new ArrayList<>();
