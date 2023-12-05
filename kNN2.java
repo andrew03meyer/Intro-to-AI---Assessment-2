@@ -283,11 +283,11 @@ public class kNN2 {
                 //For every column
                 for(int column = 0; column < 61; column++){
                     if(columnArray[column].equals("1")) {
-                        rowDifference += Math.abs((trainingData[trainDataRow][column]) - (testingData[testDataRow][column]));
+                        rowDifference += Math.pow(Math.abs((trainingData[trainDataRow][column]) - (testingData[testDataRow][column])), 2);
                     }
                 }
                 //Find total train row distance
-                //rowDifference = Math.sqrt(rowDifference);
+                rowDifference = Math.sqrt(rowDifference);
                 ArrayList<String> temp = new ArrayList<>();
                 temp.add(String.valueOf(rowDifference));
                 temp.add(String.valueOf(trainDataRow));
