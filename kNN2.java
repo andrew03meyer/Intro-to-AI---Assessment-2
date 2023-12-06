@@ -182,7 +182,6 @@ public class kNN2 {
         Random rnd = new Random();
 
         //Initial population of array
-        //population.add("0 0 0 0 0 1 1 1 0 0 0 0 0 0 1 0 1 0 0 1 0 0 1 1 1 1 0 1 1 0 1 1 0 1 0 0 0 1 1 0 1 0 1 1 1 1 0 0 0 0 0 0 1 1 1 1 0 0 1 0 1 ");
         for(int x = 0; x < 100; x++){
             String stringValue = "";
 
@@ -231,8 +230,6 @@ public class kNN2 {
             //Best accuracy
             accuracy = GetBestAccuracy(accuracies);
 
-            //System.out.println(accuracies);
-            //System.out.println("Population 0: " + population.get(0));
             printBest(population, accuracy, accuracies);
             System.out.println("Accuracy: " + accuracy);
             repeats++;
@@ -247,8 +244,8 @@ public class kNN2 {
      */
     public static ArrayList<Double> GetAccuracy(ArrayList<String> population, Double[][] trainingData, Double[][]testingData, int[]testingLabels, int[] trainingLabels){
 
-        //measuring time
-        Double timeStart = Double.parseDouble(String.valueOf(System.nanoTime()));
+        /*measuring time
+        Double timeStart = Double.parseDouble(String.valueOf(System.nanoTime()));*/
 
         //For every row in population, get accuracy
         ArrayList<Double> selectionAccuracy = new ArrayList<>();
@@ -256,9 +253,9 @@ public class kNN2 {
             selectionAccuracy.add(GetAccuracyIndividual(columnSelection , trainingLabels, testingLabels, trainingData, testingData));
         }
 
-        //time
+        /*Time
         Double timeFinish = Double.parseDouble(String.valueOf(System.nanoTime()));
-        System.out.println("Time taken: " + (timeFinish-timeStart)/1000000000);
+        System.out.println("Time taken: " + (timeFinish-timeStart)/1000000000);*/
 
         return selectionAccuracy;
     }
