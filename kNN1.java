@@ -13,7 +13,6 @@ public class kNN1{
         Double tsd[][] = GetTestingData();
         int[] trl = GetTrainingLabel();
         int[] tsl = GetTestLabel();
-        int[] out = GetOutputLabel();
         String values = "";
 
         for(int x = 0; x < 200; x++){
@@ -21,6 +20,7 @@ public class kNN1{
             values += " " + trl[nearestIndex];
         }
         WriteClassData(values);
+        int[] out = GetOutputLabel();
         System.out.println(CompareLabels(out, tsl));
     }
 
