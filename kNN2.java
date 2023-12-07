@@ -215,7 +215,7 @@ public class kNN2 {
 
         //Print kNN1 accuracy & and set goalAccuracy
         Double prevAccuracy = GetKnn1Accuracy(testingLabels, trainingData, trainingLabels, testingData);
-        System.out.println(prevAccuracy);
+        //System.out.println(prevAccuracy);
         Double goalAccuracy = prevAccuracy+40;
 
         if(goalAccuracy > 100){
@@ -227,7 +227,7 @@ public class kNN2 {
         accuracy = GetBestAccuracy(accuracies);
 
         //Printing out first accuracy
-        System.out.println(accuracy);
+        //System.out.println(accuracy);
 
         while(accuracy < goalAccuracy && repeats < 35){
 
@@ -252,14 +252,14 @@ public class kNN2 {
             //Best accuracy
             accuracy = GetBestAccuracy(accuracies);
 
-            System.out.println(printBest(population, accuracy, accuracies));
-            System.out.println("Accuracy: " + accuracy);
+            //System.out.println(printBest(population, accuracy, accuracies));
+            //System.out.println("Accuracy: " + accuracy);
 
             repeats++;
         }
 
         //Update testRowClass Array to the values of the most accurate column selection
-        GetAccuracyIndividual(printBest(population, accuracy, accuracies), trainingLabels, testingLabels, trainingData, testingData);
+        GetAccuracyIndividual(GetBest(population, accuracy, accuracies), trainingLabels, testingLabels, trainingData, testingData);
         //Write improved values
         WriteClassData();
     }
@@ -508,7 +508,7 @@ public class kNN2 {
      * Prints column selection for the best accuracy
      * @parameters - population, best accuracy, all accuracies
      */
-    public static String printBest(ArrayList<String> population, Double accuracy, ArrayList<Double> accuracies){
+    public static String GetBest(ArrayList<String> population, Double accuracy, ArrayList<Double> accuracies){
         int index = accuracies.indexOf(accuracy);
         return population.get(index);
     }
