@@ -21,7 +21,7 @@ public class kNN1{
         }
         WriteClassData(values);
         int[] out = GetOutputLabel();
-        System.out.println(CompareLabels(out, tsl));
+        //System.out.println(CompareLabels(out, tsl));
     }
 
     /*
@@ -172,7 +172,7 @@ public class kNN1{
         for(int row = 0; row < 200; row++){
             differences[row] = Double.parseDouble("0");
             for(int column = 0; column < 61; column++){
-                differences[row] = differences[row] + (Math.abs((trainingData[row][column]) - (testingData[column]) * Math.abs((trainingData[row][column]) - (testingData[column]))));
+                differences[row] = differences[row] + Math.pow(Math.abs((trainingData[row][column]) - (testingData[column])),2);
             }
             differences[row] = Math.sqrt(differences[row]);
             //System.out.println(differences[row]);
@@ -235,7 +235,7 @@ public class kNN1{
                 y++;
             }
         }
-        System.out.println(y);
+        //System.out.println(y);
         Double temp = (Double.parseDouble(String.valueOf(y)))*(Double.parseDouble("100"))/(Double.parseDouble("200"));
         return temp;
     }
