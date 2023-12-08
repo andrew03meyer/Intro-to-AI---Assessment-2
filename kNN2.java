@@ -215,7 +215,7 @@ public class kNN2 {
 
         //Print kNN1 accuracy & and set goalAccuracy
         Double prevAccuracy = GetKnn1Accuracy(testingLabels, trainingData, trainingLabels, testingData);
-        //System.out.println(prevAccuracy);
+        System.out.println("initial: " + prevAccuracy);
         Double goalAccuracy = prevAccuracy+40;
 
         if(goalAccuracy > 100){
@@ -253,7 +253,7 @@ public class kNN2 {
             accuracy = GetBestAccuracy(accuracies);
 
             //System.out.println(printBest(population, accuracy, accuracies));
-            //System.out.println("Accuracy: " + accuracy);
+            System.out.println("Accuracy: " + accuracy);
 
             repeats++;
         }
