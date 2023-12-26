@@ -252,7 +252,6 @@ public class kNN2 {
             //Best accuracy
             accuracy = GetBestAccuracy(accuracies);
 
-            //System.out.println(printBest(population, accuracy, accuracies));
             System.out.println("Accuracy: " + accuracy);
 
             repeats++;
